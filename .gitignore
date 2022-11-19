@@ -68,5 +68,6 @@ BootLoaderFileSystem/efi/boot/*
 !BootLoaderFileSystem/etc
 BootLoaderFileSystem/etc/*
 !BootLoaderFileSystem/etc/boot_info.yaml
+!BootLoaderFileSystem/etc/OVMF.fd
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||
 #=====================================================
