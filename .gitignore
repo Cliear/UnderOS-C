@@ -50,3 +50,23 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# exclude project output dir
+output/
+
+#=====================================================
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||
+# exclude BootLoaderFileSystem
+# but need to include boot file 
+BootLoaderFileSystem/*
+!BootLoaderFileSystem/efi
+BootLoaderFileSystem/efi/*
+!BootLoaderFileSystem/efi/boot
+BootLoaderFileSystem/efi/boot/*
+!BootLoaderFileSystem/efi/boot/bootx64.efi
+# and include config file 
+!BootLoaderFileSystem/etc
+BootLoaderFileSystem/etc/*
+!BootLoaderFileSystem/etc/boot_info.yaml
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||
+#=====================================================

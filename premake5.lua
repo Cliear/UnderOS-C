@@ -1,0 +1,1 @@
+include("tool/script/dependencies.lua");
