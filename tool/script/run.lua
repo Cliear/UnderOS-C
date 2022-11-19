@@ -10,7 +10,8 @@ local objcopy_command =
     'objcopy -S -R ".eh.frame" -R ".comment" -j .text -j .data -j .rdata -j .dynamic -j .got -j .rodata -O binary App output'
 
 function script_help()
-    local help_string = [[
+    local help_string = 
+[[
 
 ==========================================================
 Usage: premake5 script [command] [paraments]...[example]
@@ -40,7 +41,6 @@ function script_compile()
     print("compile finished!");
 end
 
-
 function script_collect()
     print("excute the colloect command!");
     if #_ARGS >= 2 then
@@ -50,12 +50,14 @@ function script_collect()
             local src_file_name = path.join(_WORKING_DIR, "output", "example", "example");
             if os.host() == "windows" then
                 src_file_name = src_file_name .. ".exe";
-             end
+            end
             if os.locate(src_file_name) == nil then
+                print("Don't find the target, now start to build it!");
                 os.execute("premake5 script compile example");
             end
-            os.executef('objcopy -S -R ".eh.frame" -R ".comment" -j .text -j .data -j .rdata -j .dynamic -j .got -j .rodata -O binary %s %s',
-                        src_file_name, path.join(_WORKING_DIR, "output", "example", "example.bin"));
+            os.executef(
+                'objcopy -S -R ".eh.frame" -R ".comment" -j .text -j .data -j .rdata -j .dynamic -j .got -j .rodata -O binary %s %s',
+                src_file_name, path.join(_WORKING_DIR, "output", "example", "example.bin"));
         end
     end
     print("colloect finished!");
@@ -69,9 +71,21 @@ function script_copy_target()
             print("colloect the example!");
             local src_file_name = path.join(_WORKING_DIR, "output", "example", "example.bin");
             if os.locate(src_file_name) == nil then
+                print("Don't find the target, now start to build it!");
                 os.execute("premake5 script collect example");
             end
-            ok, err = os.copyfile(src_file_name, path.join(_WORKING_DIR, "BootLoaderFileSystem", "system", "result.bin"))
+            local tartget_dir = path.join(_WORKING_DIR, "BootLoaderFileSystem", "system");
+            if os.locate(tartget_dir) == nil then
+                print("Don't find the target dir, now remake it!");
+                os.mkdir(tartget_dir);
+            end
+            local ok, err = os.copyfile(src_file_name,
+                path.join(_WORKING_DIR, "BootLoaderFileSystem", "system", "result.bin"))
+            if ok == nil then
+                error_excute(function()
+                    print("Can't copy the target!");
+                end)
+            end
         end
     end
     print("colloect finished!");
@@ -82,15 +96,19 @@ function script_run()
     if #_ARGS >= 2 then
         local parament_string = string.lower(_ARGS[2]);
         if parament_string == "example" then
-            print("colloect the example!");
+            print("run the example!");
             local src_file_name = path.join(_WORKING_DIR, "BootLoaderFileSystem", "system", "result.bin");
             if os.locate(src_file_name) == nil then
+                print("Don't find the target, now start to build it!");
                 os.execute("premake5 script copy_target example");
             end
-            os.execute('qemu-system-x86_64 -L BootLoaderFileSystem/etc -bios OVMF.fd -M "pc" -m 256 -cpu "qemu64" -smp cores=2 -vga cirrus -serial vc -parallel vc -name "UEFI" -boot order=dc -hdc fat:rw:./BootLoaderFileSystem');
+            local emulator_command_string = string.format(
+                'qemu-system-x86_64 -L %s -bios OVMF.fd -M "pc" -m 256 -cpu "qemu64" -smp cores=2 -vga cirrus -serial vc -parallel vc -name "UEFI" -boot order=dc -hdc fat:rw:%s',
+                path.join(_WORKING_DIR, "BootLoaderFileSystem", "etc"), path.join(_WORKING_DIR, "BootLoaderFileSystem"));
+            os.execute(emulator_command_string);
         end
     end
-    print("colloect finished!");
+    print("Run finished!");
 end
 
 function warn_excute(functor)
@@ -119,7 +137,7 @@ local script_command = {
     compile = script_compile,
     collect = script_collect,
     copy_target = script_copy_target,
-    run = script_run,
+    run = script_run
 };
 function script_command_convert(command_string)
     for key, value in pairs(script_command) do
