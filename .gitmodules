@@ -1,0 +1,3 @@
+[submodule "code/UnderOS/freestanding/c_std"]
+	path = code/UnderOS/freestanding/c_std
+	url = https://github.com/Cliear/freestanding-std-c

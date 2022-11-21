@@ -52,7 +52,7 @@ Mkfile.old
 dkms.conf
 
 # exclude project output dir
-output/
+**output**
 
 #=====================================================
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -71,3 +71,5 @@ BootLoaderFileSystem/etc/*
 !BootLoaderFileSystem/etc/OVMF.fd
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||
 #=====================================================
+
+compile_command.json
